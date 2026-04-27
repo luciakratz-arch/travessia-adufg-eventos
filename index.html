@@ -96,6 +96,32 @@ body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);font-
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:14px 28px;border-radius:30px;font-size:1rem;font-weight:500;opacity:0;transition:all 0.3s;z-index:9999;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .nota-final{text-align:center;padding:24px;color:var(--muted);font-style:italic;font-family:"Cormorant Garamond",serif;font-size:1.3rem;}
+.ev-edit-row{background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.ev-edit-row.passado{opacity:0.45;pointer-events:none;}
+.ev-edit-titulo{font-family:"Cormorant Garamond",serif;font-size:1.1rem;font-weight:600;margin-bottom:10px;color:var(--ink);}
+.ev-edit-titulo span{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-left:8px;font-family:"Nunito",sans-serif;font-weight:400;}
+.ev-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ev-edit-grid label{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px;}
+.ev-edit-grid input{width:100%;border:1.5px solid #ddd;border-radius:8px;padding:8px 12px;font-family:"Nunito",sans-serif;font-size:0.9rem;color:var(--ink);background:#fff;outline:none;}
+.ev-edit-grid input:focus{border-color:#4a8f5f;}
+.ev-edit-passado-label{font-size:0.75rem;color:#bbb;font-style:italic;}
+.btn-salvar-ev{background:linear-gradient(135deg,#4a8f5f,#7abf90);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-family:"Nunito",sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;}
+.btn-excluir-ev{background:none;border:1.5px solid #e74c3c;color:#e74c3c;border-radius:8px;padding:8px 16px;font-family:"Nunito",sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-excluir-ev:hover{background:#e74c3c;color:#fff;}
+
+.btn-restaurar-ev{background:none;border:1.5px solid #5a7eb0;color:#5a7eb0;border-radius:8px;padding:8px 16px;font-family:"Nunito",sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-restaurar-ev:hover{background:#5a7eb0;color:#fff;}
+.ev-edit-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.modal-confirm{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-confirm-box{background:#fff;border-radius:16px;padding:28px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-confirm-box h3{font-family:"Cormorant Garamond",serif;font-size:1.5rem;margin-bottom:10px;}
+.modal-confirm-box p{font-size:0.95rem;color:#555;line-height:1.6;margin-bottom:20px;}
+.modal-confirm-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.modal-confirm-btns button{flex:1;padding:12px;border-radius:10px;font-family:"Nunito",sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;border:none;}
+.btn-confirm-ok{background:linear-gradient(135deg,#4a8f5f,#7abf90);color:#fff;}
+.btn-confirm-cancel{background:#f0f0ee;color:#555;}
+.btn-confirm-danger{background:#e74c3c;color:#fff;}
+.ev-ocultos-titulo{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:#bbb;margin:16px 0 8px;padding-top:12px;border-top:1px solid #eee;}
 @media(max-width:520px){
   .card-inner{flex-direction:column;align-items:flex-start;}
   .card-actions{width:100%;flex-direction:row;flex-wrap:wrap;}
@@ -109,6 +135,7 @@ body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);font-
   <span class="admin-label">Grupo Travessia - Gestao</span>
   <div class="admin-btns">
     <button class="btn-dark" onclick="abrirNovoEvento()">+ Novo Evento</button>
+    <button class="btn-dark" onclick="abrirEditarEventos()">Editar Eventos</button>
     <button class="btn-dark" onclick="abrirMudarAno()">Mudar Ano</button>
     <button class="btn-dark" onclick="abrirAdminGeral()">Ver Inscricoes</button>
     <button class="btn-dark" onclick="gerarRelatorioAnual()">Relatorio Anual</button>
@@ -197,6 +224,23 @@ body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);font-
     <button class="btn-confirmar" onclick="mudarAno()">Confirmar</button>
   </div>
 </div>
+<div class="overlay" id="overlayEditarEventos">
+  <div class="modal" style="max-width:660px">
+    <button class="modal-close" onclick="fecharEditarEventos()">x</button>
+    <h2>Editar Eventos</h2>
+    <div class="modal-sub">Somente eventos futuros serao alterados</div>
+    <div id="listaEditarEventos"></div>
+  </div>
+</div>
+
+<div class="modal-confirm" id="modalConfirm" style="display:none;">
+  <div class="modal-confirm-box">
+    <h3 id="mcTitulo"></h3>
+    <p id="mcMensagem"></p>
+    <div class="modal-confirm-btns" id="mcBotoes"></div>
+  </div>
+</div>
+
 <div class="pdf-overlay" id="pdfOverlay">
   <div class="pdf-bar">
     <button class="btn-dark" onclick="fecharPDF()">Voltar</button>
@@ -207,7 +251,7 @@ body{font-family:"Nunito",sans-serif;background:var(--bg);color:var(--ink);font-
 </div>
 <div class="toast" id="toast"></div>
 <script>
-var EVENTOS_BASE = [{"id": "leitura-feb", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-02-05", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-mar", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-03-03", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-mar", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-03-17", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-mar", "tipo": "vqq", "nome": "VQQ", "data": "2026-03-24", "local": "ADUFG", "hora": "18h", "obs": "24 a 27/03"}, {"id": "leitura-mar", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-03-05", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-abr", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-04-07", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-abr", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-04-28", "local": "ADUFG", "hora": "18h", "obs": "Alterado de 14/04"}, {"id": "vqq-abr", "tipo": "vqq", "nome": "VQQ", "data": "2026-04-28", "local": "ADUFG", "hora": "18h", "obs": "28/04 a 01/05", "cancelado": true}, {"id": "leitura-abr", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-04-02", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-mai", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-05-05", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-mai", "tipo": "happyhour", "nome": "Happy Hour - Jantar Dancante", "data": "2026-05-19", "local": "ADUFG", "hora": "18h", "obs": "Aniversario Travessia e Coral"}, {"id": "vqq-mai", "tipo": "vqq", "nome": "VQQ", "data": "2026-05-26", "local": "ADUFG", "hora": "18h", "obs": "26 a 29/05"}, {"id": "leitura-mai", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-05-07", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "palestra-mai", "tipo": "outros", "nome": "Palestra - Leitura de Rotulos", "data": "2026-05-13", "local": "Emporio Prime, Av. 85", "hora": "18h", "obs": "Fabiana Bonach"}, {"id": "reuniao-jun", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-06-02", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-jun", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-06-16", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-jun", "tipo": "vqq", "nome": "VQQ", "data": "2026-06-23", "local": "ADUFG", "hora": "18h", "obs": "23 a 26/06"}, {"id": "leitura-jun", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-06-11", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-ago", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-08-04", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-ago", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-08-18", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "leitura-ago", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-08-06", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "sarau-ago", "tipo": "outros", "nome": "Sarau", "data": "2026-08-25", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-set", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-09-01", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-set", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-09-15", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-set", "tipo": "vqq", "nome": "VQQ", "data": "2026-09-22", "local": "ADUFG", "hora": "18h", "obs": "22 a 25/09"}, {"id": "leitura-set", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-09-03", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-out", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-10-06", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-out", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-10-20", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-out", "tipo": "vqq", "nome": "VQQ", "data": "2026-10-27", "local": "ADUFG", "hora": "18h", "obs": "27 a 30/10"}, {"id": "leitura-out", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-10-01", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-nov", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-11-03", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-nov", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-11-16", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-nov2", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-11-17", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-nov", "tipo": "vqq", "nome": "VQQ", "data": "2026-11-24", "local": "ADUFG", "hora": "18h", "obs": "24 a 25/11"}, {"id": "leitura-nov", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-11-05", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "brunch-dez", "tipo": "outros", "nome": "Brunch / Confraternizacao", "data": "2026-12-08", "local": "ADUFG", "hora": "18h", "obs": ""}];
+var EVENTOS_BASE = [{"id": "leitura-feb", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-02-05", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "reuniao-mar", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-03-03", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-mar", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-03-17", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-mar", "tipo": "vqq", "nome": "VQQ", "data": "2026-03-24", "local": "ADUFG", "hora": "18h", "obs": "24 a 27/03"}, {"id": "leitura-mar", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-03-05", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "reuniao-abr", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-04-07", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-abr", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-04-28", "local": "ADUFG", "hora": "18h", "obs": "Alterado de 14/04"}, {"id": "vqq-abr", "tipo": "vqq", "nome": "VQQ", "data": "2026-04-28", "local": "ADUFG", "hora": "18h", "obs": "28/04 a 01/05", "cancelado": true}, {"id": "leitura-abr", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-04-02", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "reuniao-mai", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-05-05", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-mai", "tipo": "happyhour", "nome": "Happy Hour - Jantar Dancante", "data": "2026-05-19", "local": "ADUFG", "hora": "18h", "obs": "Aniversario Travessia e Coral"}, {"id": "vqq-mai", "tipo": "vqq", "nome": "VQQ", "data": "2026-05-26", "local": "ADUFG", "hora": "18h", "obs": "26 a 29/05"}, {"id": "leitura-mai", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-05-07", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "palestra-mai", "tipo": "outros", "nome": "Palestra - Leitura de Rotulos", "data": "2026-05-13", "local": "Emporio Prime, Av. 85", "hora": "18h", "obs": "Fabiana Bonach"}, {"id": "reuniao-jun", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-06-02", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-jun", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-06-16", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-jun", "tipo": "vqq", "nome": "VQQ", "data": "2026-06-23", "local": "ADUFG", "hora": "18h", "obs": "23 a 26/06"}, {"id": "leitura-jun", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-06-11", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "reuniao-ago", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-08-04", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-ago", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-08-18", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "leitura-ago", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-08-06", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "sarau-ago", "tipo": "outros", "nome": "Sarau", "data": "2026-08-25", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "reuniao-set", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-09-01", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-set", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-09-15", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-set", "tipo": "vqq", "nome": "VQQ", "data": "2026-09-22", "local": "ADUFG", "hora": "18h", "obs": "22 a 25/09"}, {"id": "leitura-set", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-09-03", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "reuniao-out", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-10-06", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-out", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-10-20", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-out", "tipo": "vqq", "nome": "VQQ", "data": "2026-10-27", "local": "ADUFG", "hora": "18h", "obs": "27 a 30/10"}, {"id": "leitura-out", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-10-01", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "reuniao-nov", "tipo": "reuniao", "nome": "Reunião Mensal", "data": "2026-11-03", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-nov", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-11-16", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "happyhour-nov2", "tipo": "happyhour", "nome": "Happy Hour", "data": "2026-11-17", "local": "ADUFG", "hora": "18h", "obs": ""}, {"id": "vqq-nov", "tipo": "vqq", "nome": "VQQ", "data": "2026-11-24", "local": "ADUFG", "hora": "18h", "obs": "24 a 25/11"}, {"id": "leitura-nov", "tipo": "leitura", "nome": "Roda de Leitura", "data": "2026-11-05", "local": "ADUFG", "hora": "15h", "obs": ""}, {"id": "brunch-dez", "tipo": "outros", "nome": "Brunch / Confraternizacao", "data": "2026-12-08", "local": "ADUFG", "hora": "18h", "obs": ""}];
 
 var MESES_NOME = ["Janeiro","Fevereiro","Marco","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 var MESES_ABR  = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -238,7 +282,20 @@ function gerarQuintas() {
 function getTodos() {
   var base = anoAtual === 2026 ? EVENTOS_BASE : [];
   var quintas = gerarQuintas();
-  var todos = base.concat(quintas).concat(eventosExtras);
+  var extras = eventosExtras;
+  var edicoes = JSON.parse(localStorage.getItem("tv_edicoes_" + anoAtual) || "{}");
+  var ocultos = JSON.parse(localStorage.getItem("tv_ocultos_" + anoAtual) || "[]");
+  var todos = base.concat(quintas).concat(extras);
+  // Filtrar eventos ocultos (mas manter histórico nas inscrições)
+  todos = todos.filter(function(ev) { return ocultos.indexOf(ev.id) === -1; });
+  // Aplicar edições apenas em eventos futuros
+  todos = todos.map(function(ev) {
+    var ed = edicoes[ev.id];
+    if (ed && !isPassado(ev.data)) {
+      return {id:ev.id, tipo:ev.tipo, nome:ed.nome||ev.nome, data:ed.data||ev.data, hora:ed.hora||ev.hora, local:ed.local||ev.local, obs:ev.obs, cancelado:ev.cancelado};
+    }
+    return ev;
+  });
   todos.sort(function(a,b) { return a.data.localeCompare(b.data); });
   return todos;
 }
@@ -263,6 +320,50 @@ function getDataObj(dataStr) {
   return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
 }
 
+function criarCard(ev) {
+  var passado = isPassado(ev.data);
+  var cancelado = ev.cancelado || false;
+  var count = totalIns(ev.id);
+  var pill = "";
+  var cls = "event-card type-" + ev.tipo;
+  if (cancelado) { cls += " cancelled"; pill = '<span class="status-pill pill-cancelled">Cancelado</span>'; }
+  else if (passado) { cls += " concluded"; pill = '<span class="status-pill pill-concluded">Concluido</span>'; }
+  else { pill = '<span class="status-pill pill-open">' + count + ' confirmado' + (count!==1?"s":"") + '</span>'; }
+  var dObj = getDataObj(ev.data);
+  var acoes = pill;
+  if (!cancelado && !passado) {
+    acoes += '<button class="btn-green" onclick="abrirModal(\'' + ev.id + '\')">Inscrever-se</button>';
+  }
+  if (!cancelado) {
+    acoes += '<button class="btn-blue" onclick="gerarPDFEvento(\'' + ev.id + '\')">Lista PDF</button>';
+  }
+  var card = document.createElement("div");
+  card.className = cls;
+  card.innerHTML = '<div class="card-stripe"></div><div class="card-inner">'
+    + '<div class="card-date-box"><div class="day">' + dObj.getDate() + '</div><div class="mon">' + MESES_ABR[dObj.getMonth()] + '</div></div>'
+    + '<div class="card-info"><div class="card-type-label">' + (TIPO_LABEL[ev.tipo]||ev.tipo) + '</div>'
+    + '<div class="card-title">' + ev.nome + '</div>'
+    + (ev.obs ? '<div class="card-obs">' + ev.obs + '</div>' : '')
+    + '<div class="card-meta"><span>&#128336; ' + ev.hora + '</span><span>&#128205; ' + ev.local + '</span></div>'
+    + '</div><div class="card-actions">' + acoes + '</div></div>';
+  return card;
+}
+
+function criarMesBloco(mesNome, evs, aberto) {
+  var bloco = document.createElement("div");
+  bloco.className = "month-block";
+  var btn = document.createElement("button");
+  btn.className = "month-toggle" + (aberto ? " active" : "");
+  btn.innerHTML = '<div class="month-left"><span class="month-label">' + mesNome + '</span><span class="month-count">' + evs.length + ' evento' + (evs.length!==1?"s":"") + '</span></div><span class="month-arrow">&#9662;</span>';
+  var body = document.createElement("div");
+  body.className = "month-body" + (aberto ? " open" : "");
+  (function(b,bd){ b.onclick = function(){ b.classList.toggle("active"); bd.classList.toggle("open"); }; })(btn,body);
+  for (var i=0; i<evs.length; i++) body.appendChild(criarCard(evs[i]));
+  bloco.appendChild(btn);
+  bloco.appendChild(body);
+  return bloco;
+}
+
 function renderTudo() {
   document.getElementById("brandSub").textContent = "Grupo de Convivencia - Goiania  " + anoAtual;
   var cont = document.getElementById("mesesContainer");
@@ -276,60 +377,57 @@ function renderTudo() {
   }
   var mesAtual = new Date().getMonth();
   var meses = Object.keys(porMes).sort(function(a,b){ return +a - +b; });
-  for (var mi=0; mi<meses.length; mi++) {
-    var m = meses[mi];
-    var evs = porMes[m];
-    var bloco = document.createElement("div");
-    bloco.className = "month-block";
-    var btn = document.createElement("button");
-    var isAtual = (+m === mesAtual);
-    btn.className = "month-toggle" + (isAtual ? " active" : "");
-    btn.innerHTML = '<div class="month-left"><span class="month-label">' + MESES_NOME[m] + '</span><span class="month-count">' + evs.length + ' evento' + (evs.length!==1?"s":"") + '</span></div><span class="month-arrow">&#9662;</span>';
-    var body = document.createElement("div");
-    body.className = "month-body" + (isAtual ? " open" : "");
-    (function(b, bd) {
-      b.onclick = function() { b.classList.toggle("active"); bd.classList.toggle("open"); };
-    })(btn, body);
-    for (var ei=0; ei<evs.length; ei++) {
-      var ev = evs[ei];
-      var passado = isPassado(ev.data);
-      var cancelado = ev.cancelado || false;
-      var count = totalIns(ev.id);
-      var pill = "";
-      var cls = "event-card type-" + ev.tipo;
-      if (cancelado) { cls += " cancelled"; pill = '<span class="status-pill pill-cancelled">Cancelado</span>'; }
-      else if (passado) { cls += " concluded"; pill = '<span class="status-pill pill-concluded">Concluido</span>'; }
-      else { pill = '<span class="status-pill pill-open">' + count + ' confirmado' + (count!==1?"s":"") + '</span>'; }
-      var dObj = getDataObj(ev.data);
-      var dia = dObj.getDate();
-      var mesAbr = MESES_ABR[dObj.getMonth()];
-      var acoes = pill;
-      if (!cancelado && !passado) {
-        acoes += '<button class="btn-green" onclick="abrirModal(\'' + ev.id + '\')">Inscrever-se</button>';
-      }
-      if (!cancelado) {
-        acoes += '<button class="btn-blue" onclick="gerarPDFEvento(\'' + ev.id + '\')">Lista PDF</button>';
-      }
-      var card = document.createElement("div");
-      card.className = cls;
-      card.innerHTML = '<div class="card-stripe"></div><div class="card-inner">'
-        + '<div class="card-date-box"><div class="day">' + dia + '</div><div class="mon">' + mesAbr + '</div></div>'
-        + '<div class="card-info"><div class="card-type-label">' + (TIPO_LABEL[ev.tipo] || ev.tipo) + '</div>'
-        + '<div class="card-title">' + ev.nome + '</div>'
-        + (ev.obs ? '<div class="card-obs">' + ev.obs + '</div>' : '')
-        + '<div class="card-meta"><span>&#128336; ' + ev.hora + '</span><span>&#128205; ' + ev.local + '</span></div>'
-        + '</div><div class="card-actions">' + acoes + '</div></div>';
-      body.appendChild(card);
+  var mesesPassados = [];
+  var mesesAtualFuturo = [];
+  for (var i=0; i<meses.length; i++) {
+    if (+meses[i] < mesAtual) mesesPassados.push(meses[i]);
+    else mesesAtualFuturo.push(meses[i]);
+  }
+  if (mesesPassados.length > 0) {
+    var blocoAnt = document.createElement("div");
+    blocoAnt.className = "month-block";
+    var btnAnt = document.createElement("button");
+    btnAnt.className = "month-toggle";
+    btnAnt.style.borderLeftColor = "#bbb";
+    var labelAnt = document.createElement("div");
+    labelAnt.className = "month-left";
+    var spanLabel = document.createElement("span");
+    spanLabel.className = "month-label";
+    spanLabel.style.color = "#aaa";
+    spanLabel.style.fontStyle = "italic";
+    spanLabel.textContent = "Meses anteriores";
+    var spanCount = document.createElement("span");
+    spanCount.className = "month-count";
+    spanCount.textContent = mesesPassados.length + " mes" + (mesesPassados.length!==1?"es":"");
+    labelAnt.appendChild(spanLabel);
+    labelAnt.appendChild(spanCount);
+    var arrowAnt = document.createElement("span");
+    arrowAnt.className = "month-arrow";
+    arrowAnt.style.color = "#bbb";
+    arrowAnt.innerHTML = "&#9662;";
+    btnAnt.appendChild(labelAnt);
+    btnAnt.appendChild(arrowAnt);
+    var bodyAnt = document.createElement("div");
+    bodyAnt.className = "month-body";
+    bodyAnt.style.padding = "10px 12px 14px";
+    (function(b,bd){ b.onclick = function(){ b.classList.toggle("active"); bd.classList.toggle("open"); }; })(btnAnt, bodyAnt);
+    for (var pi=0; pi<mesesPassados.length; pi++) {
+      bodyAnt.appendChild(criarMesBloco(MESES_NOME[mesesPassados[pi]], porMes[mesesPassados[pi]], false));
     }
-    bloco.appendChild(btn);
-    bloco.appendChild(body);
-    cont.appendChild(bloco);
+    blocoAnt.appendChild(btnAnt);
+    blocoAnt.appendChild(bodyAnt);
+    cont.appendChild(blocoAnt);
+  }
+  for (var mi=0; mi<mesesAtualFuturo.length; mi++) {
+    var m = mesesAtualFuturo[mi];
+    cont.appendChild(criarMesBloco(MESES_NOME[m], porMes[m], +m === mesAtual));
   }
   var nota = document.createElement("div");
   nota.className = "nota-final";
   nota.textContent = "Atividades retomam em " + (anoAtual + 1) + ". Ate la!";
   cont.appendChild(nota);
 }
+
 
 var evAtual = null;
 
@@ -736,13 +834,210 @@ function gerarRelatorioAnual() {
   abrirPDF(htmlRel);
 }
 
+function abrirEditarEventos() {
+  var container = document.getElementById("listaEditarEventos");
+  container.innerHTML = "";
+  var base = anoAtual === 2026 ? EVENTOS_BASE : [];
+  var todos = base.concat(eventosExtras);
+  todos.sort(function(a,b){ return a.data.localeCompare(b.data); });
+  var edicoes = JSON.parse(localStorage.getItem("tv_edicoes_" + anoAtual) || "{}");
+  todos.forEach(function(ev) {
+    var passado = isPassado(ev.data);
+    var edicao = edicoes[ev.id] || {};
+    var nomeAtual = edicao.nome || ev.nome;
+    var dataAtual = edicao.data || ev.data;
+    var horaAtual = edicao.hora || ev.hora;
+    var localAtual = edicao.local || ev.local;
+    var row = document.createElement("div");
+    row.className = "ev-edit-row" + (passado ? " passado" : "");
+    if (passado) {
+      var t = document.createElement("div");
+      t.className = "ev-edit-titulo";
+      t.textContent = nomeAtual + " - " + getDataObj(dataAtual).toLocaleDateString("pt-BR");
+      var p = document.createElement("div");
+      p.className = "ev-edit-passado-label";
+      p.textContent = "Evento ja realizado - nao pode ser editado";
+      row.appendChild(t);
+      row.appendChild(p);
+    } else {
+      var t = document.createElement("div");
+      t.className = "ev-edit-titulo";
+      t.textContent = (TIPO_LABEL[ev.tipo]||ev.tipo) + " - futuro";
+      row.appendChild(t);
+      var grid = document.createElement("div");
+      grid.className = "ev-edit-grid";
+      var campos = [
+        {label:"Nome", id:"ed_nome_"+ev.id, type:"text", val:nomeAtual},
+        {label:"Data", id:"ed_data_"+ev.id, type:"date", val:dataAtual},
+        {label:"Horario", id:"ed_hora_"+ev.id, type:"text", val:horaAtual},
+        {label:"Local", id:"ed_local_"+ev.id, type:"text", val:localAtual}
+      ];
+      campos.forEach(function(c) {
+        var div = document.createElement("div");
+        var lbl = document.createElement("label");
+        lbl.textContent = c.label;
+        var inp = document.createElement("input");
+        inp.type = c.type;
+        inp.id = c.id;
+        inp.value = c.val;
+        div.appendChild(lbl);
+        div.appendChild(inp);
+        grid.appendChild(div);
+      });
+      row.appendChild(grid);
+      var divBtns = document.createElement("div");
+      divBtns.className = "ev-edit-btns";
+      var btn = document.createElement("button");
+      btn.className = "btn-salvar-ev";
+      btn.textContent = "Salvar alteracao";
+      (function(eid) { btn.onclick = function() { salvarEdicaoEvento(eid); }; })(ev.id);
+      var btnEx = document.createElement("button");
+      btnEx.className = "btn-excluir-ev";
+      btnEx.textContent = "Excluir evento";
+      (function(eid, enome) {
+        btnEx.onclick = function() { ocultarEvento(eid, enome); };
+      })(ev.id, ev.nome);
+      divBtns.appendChild(btn);
+      divBtns.appendChild(btnEx);
+      row.appendChild(divBtns);
+    }
+    container.appendChild(row);
+  });
+  // Seção de eventos ocultos
+  var ocultos = JSON.parse(localStorage.getItem("tv_ocultos_" + anoAtual) || "[]");
+  if (ocultos.length > 0) {
+    var base = anoAtual === 2026 ? EVENTOS_BASE : [];
+    var todosBase = base.concat(eventosExtras);
+    var evOcultos = todosBase.filter(function(ev) { return ocultos.indexOf(ev.id) !== -1; });
+    if (evOcultos.length > 0) {
+      var tit = document.createElement("div");
+      tit.className = "ev-ocultos-titulo";
+      tit.textContent = "Eventos excluidos (historico preservado)";
+      container.appendChild(tit);
+      evOcultos.forEach(function(ev) {
+        var rowOc = document.createElement("div");
+        rowOc.className = "ev-edit-row";
+        rowOc.style.opacity = "0.5";
+        var tOc = document.createElement("div");
+        tOc.className = "ev-edit-titulo";
+        tOc.textContent = ev.nome + " - " + getDataObj(ev.data).toLocaleDateString("pt-BR");
+        var btnRest = document.createElement("button");
+        btnRest.className = "btn-restaurar-ev";
+        btnRest.textContent = "Restaurar evento";
+        (function(eid) { btnRest.onclick = function() { restaurarEvento(eid); }; })(ev.id);
+        rowOc.appendChild(tOc);
+        rowOc.appendChild(btnRest);
+        container.appendChild(rowOc);
+      });
+    }
+  }
+
+  document.getElementById("overlayEditarEventos").classList.add("active");
+}
+
+function salvarEdicaoEvento(id) {
+  var nome = document.getElementById("ed_nome_"+id).value.trim();
+  var data = document.getElementById("ed_data_"+id).value;
+  var hora = document.getElementById("ed_hora_"+id).value.trim();
+  var local = document.getElementById("ed_local_"+id).value.trim();
+  if (!nome || !data) { toast("Preencha nome e data."); return; }
+
+  // Encontrar evento
+  var todos = getTodos();
+  var evEd = null;
+  for (var i=0; i<todos.length; i++) { if (todos[i].id === id) { evEd = todos[i]; break; } }
+  if (!evEd) return;
+
+  var tipoNome = TIPO_LABEL[evEd.tipo] || evEd.tipo;
+  var edicoes = JSON.parse(localStorage.getItem("tv_edicoes_" + anoAtual) || "{}");
+
+  // Perguntar escopo da alteracao
+  var msg = "Confirme: OK = somente este evento / Cancelar = todos os futuros do tipo " + tipoNome;
+  var soEste = confirm(msg);
+  if (soEste) {
+    // Alterar somente este evento
+    edicoes[id] = {nome:nome, data:data, hora:hora, local:local};
+    toast("Evento alterado!");
+  } else {
+    // Alterar todos os eventos futuros do mesmo tipo
+    var base = anoAtual === 2026 ? EVENTOS_BASE : [];
+    var todosParaEditar = base.concat(eventosExtras);
+    for (var i=0; i<todosParaEditar.length; i++) {
+      var ev = todosParaEditar[i];
+      if (ev.tipo === evEd.tipo && !isPassado(ev.data)) {
+        // Mantém a data original de cada evento, só muda nome, hora e local
+        edicoes[ev.id] = {
+          nome: nome,
+          data: edicoes[ev.id] ? edicoes[ev.id].data : ev.data,
+          hora: hora,
+          local: local
+        };
+      }
+    }
+    toast("Todos os eventos futuros foram atualizados!");
+  }
+
+  localStorage.setItem("tv_edicoes_" + anoAtual, JSON.stringify(edicoes));
+  fecharEditarEventos();
+  renderTudo();
+}
+
+function fecharEditarEventos() {
+  document.getElementById("overlayEditarEventos").classList.remove("active");
+}
+
+function ocultarEvento(id, nome) {
+  showConfirm(
+    "Excluir evento",
+    "Deseja excluir o evento: " + nome + "? O historico de inscricoes sera preservado para os relatorios.",
+    [
+      {label:"Cancelar", cls:"btn-confirm-cancel", action: null},
+      {label:"Excluir", cls:"btn-confirm-danger", action: function() {
+        var ocultos = JSON.parse(localStorage.getItem("tv_ocultos_" + anoAtual) || "[]");
+        if (ocultos.indexOf(id) === -1) ocultos.push(id);
+        localStorage.setItem("tv_ocultos_" + anoAtual, JSON.stringify(ocultos));
+        toast("Evento excluido. Historico preservado!");
+        fecharEditarEventos();
+        renderTudo();
+      }}
+    ]
+  );
+}
+
+function restaurarEvento(id) {
+  var ocultos = JSON.parse(localStorage.getItem("tv_ocultos_" + anoAtual) || "[]");
+  ocultos = ocultos.filter(function(oid) { return oid !== id; });
+  localStorage.setItem("tv_ocultos_" + anoAtual, JSON.stringify(ocultos));
+  toast("Evento restaurado!");
+  fecharEditarEventos();
+  renderTudo();
+}
+
+function showConfirm(titulo, mensagem, botoes) {
+  document.getElementById("mcTitulo").textContent = titulo;
+  document.getElementById("mcMensagem").textContent = mensagem;
+  var cont = document.getElementById("mcBotoes");
+  cont.innerHTML = "";
+  botoes.forEach(function(b) {
+    var btn = document.createElement("button");
+    btn.textContent = b.label;
+    btn.className = b.cls || "btn-confirm-ok";
+    btn.onclick = function() {
+      document.getElementById("modalConfirm").style.display = "none";
+      if (b.action) b.action();
+    };
+    cont.appendChild(btn);
+  });
+  document.getElementById("modalConfirm").style.display = "flex";
+}
+
 function toast(msg) {
   var t = document.getElementById("toast");
   t.textContent = msg; t.classList.add("show");
   setTimeout(function() { t.classList.remove("show"); }, 2800);
 }
 
-var ids = ["overlayInscricao","overlayAdmin","overlayNovoEvento","overlayAno"];
+var ids = ["overlayInscricao","overlayAdmin","overlayNovoEvento","overlayAno","overlayEditarEventos"];
 for (var i=0; i<ids.length; i++) {
   (function(id) {
     document.getElementById(id).addEventListener("click", function(e) {
